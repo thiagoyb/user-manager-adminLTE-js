@@ -11,27 +11,34 @@ class UserControlller{
             event.preventDefault();
 
             let values = this.getValues();
-            this.loadPhoto(uriImage =>{
+            this.loadPhoto().then(uriImage =>{
                 values.photo = uriImage;
                 this.addLine(values);
+            }, e =>{
+                console.error(e);
             });
         });
     }
 
-    loadPhoto(returnPhoto){        
-        let photoFile = [...this.formEl.elements].filter(item =>{
-            if(item.type=='file'){
-                return item;
+    loadPhoto(){        
+        return new Promise((resolve, reject)=>{
+            let photoFile = [...this.formEl.elements].filter(item =>{
+                if(item.type=='file'){
+                    return item;
+                }
+            })[0].files[0];
+    
+            if(this.validatePhoto(photoFile)){
+                let reader = new FileReader();
+                reader.onload = ()=>{
+                    resolve(reader.result);
+                };
+                reader.onerror = (e)=>{
+                    reject(e);
+                };
+                reader.readAsDataURL(photoFile);
             }
-        })[0].files[0];
-
-        if(this.validatePhoto(photoFile)){
-            let reader = new FileReader();
-            reader.onload = ()=>{
-                returnPhoto(reader.result);
-            };
-            reader.readAsDataURL(photoFile);
-        }
+        });
     }
 
     validatePhoto(file){
