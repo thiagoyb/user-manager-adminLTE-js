@@ -22,14 +22,11 @@ form.addEventListener('submit', event =>{
         if(e.type=="radio"){
             if(e.checked) user[e.name] = e.value;
         } else{
-            if(e.value!='') user[e.name] = e.value;
-            /*else{
-                alert('Preeencha o campo '+e.name);
-                e.focus();
-                return;
-            }*/
+            if(e.value!='') user[e.name] = e.value;            
         }
     });
-    addLine(user);
+
+    let objectUser = new User(user);
+    addLine(objectUser);
 });
 
