@@ -28,7 +28,7 @@ class UserControlller{
                 }
             })[0].files[0];
     
-            if(this.validatePhoto(photoFile)){
+            if(photoFile && this.validatePhoto(photoFile)){
                 let reader = new FileReader();
                 reader.onload = ()=>{
                     resolve(reader.result);
@@ -37,6 +37,8 @@ class UserControlller{
                     reject(e);
                 };
                 reader.readAsDataURL(photoFile);
+            } else{
+                resolve('dist/img/boxed-bg.jpg');
             }
         });
     }
@@ -61,6 +63,8 @@ class UserControlller{
         Array.from(this.formEl.elements).forEach((e, i)=>{
             if(e.type=="radio"){
                 if(e.checked) user[e.name] = e.value;
+            } else if(e.type=="checkbox"){
+                user[e.name] = e.checked;
             } else{
                 if(e.value!='') user[e.name] = e.value;            
             }
@@ -71,6 +75,7 @@ class UserControlller{
 
     addLine(dataUser){
         let tr = document.createElement("TR");
+        dataUser.admin = dataUser.admin===true||dataUser.admin==='true'  ? 'Sim' : 'Não';
         tr.innerHTML = `
             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
             <td>${dataUser.name}</td>
