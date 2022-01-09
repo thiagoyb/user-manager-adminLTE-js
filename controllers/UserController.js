@@ -15,8 +15,10 @@ class UserControlller{
 
             let values = this.getValues();
             this.loadPhoto().then(uriImage =>{
-                values.photo = uriImage;
-                this.addLine(values);
+                if(values.length>=3){
+                    values.photo = uriImage;
+                    this.addLine(values);
+                }
 
                 this.formEl.reset();
                 btnSubmit.disabled = false;
@@ -66,7 +68,15 @@ class UserControlller{
 
     getValues(){
         let user = {};
+        let isValid = true;
+
         Array.from(this.formEl.elements).forEach((e, i)=>{
+            if(['name','email','password'].indexOf(e.name)>-1 && !e.value){
+                e.parentElement.classList.add('has-error');
+                e.focus();
+                isValid = false;
+            }
+
             if(e.type=="radio"){
                 if(e.checked) user[e.name] = e.value;
             } else if(e.type=="checkbox"){
@@ -76,7 +86,7 @@ class UserControlller{
             }
         });
     
-        return new User(user);
+        return isValid ? new User(user) : {};
     }
 
     addLine(dataUser){
