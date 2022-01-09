@@ -15,7 +15,7 @@ class UserControlller{
 
             let values = this.getValues();
             this.loadPhoto().then(uriImage =>{
-                if(values.length>=3){
+                if(values){
                     values.photo = uriImage;
                     this.addLine(values);
                 }
@@ -91,6 +91,8 @@ class UserControlller{
 
     addLine(dataUser){
         let tr = document.createElement("TR");
+        tr.dataset.user = JSON.stringify(dataUser);
+
         let isAdmin = dataUser.admin===true||dataUser.admin==='true'  ? 'Sim' : 'Não';
         tr.innerHTML = `
             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
@@ -103,5 +105,22 @@ class UserControlller{
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
             </td>`;
         this.tableEl.appendChild(tr);
+
+        this.updateStats();        
+    }
+
+    updateStats(){
+        let countUsers = 0;
+        let countAdmin = 0;
+
+        Array.from(this.tableEl.children).forEach(tr =>{
+            countUsers++;
+
+            let user = JSON.parse(tr.dataset.user);
+            if(user._admin) countAdmin++;
+        });
+
+        document.querySelector('#count-users').innerHTML = countUsers;
+        document.querySelector('#count-users-admin').innerHTML = countAdmin;
     }
 }
