@@ -21,16 +21,22 @@ class UserControlller{
             btnSubmit.disabled = true;
 
             let dataUser = this.getValues(this.formUpdate);
-            let tr =  this.tableEl.rows[this.formUpdate.dataset.trIndex];
+            this.loadPhoto(this.formUpdate).then(uriImage =>{
+                let oldImg = this.formUpdate.querySelector('img.current-photo').src;
+                dataUser.photo = !uriImage ? oldImg : uriImage;
 
-            tr.dataset.user = JSON.stringify(dataUser);
-            this.editLine(tr, dataUser);
+                let tr =  this.tableEl.rows[this.formUpdate.dataset.trIndex];
+                tr.dataset.user = JSON.stringify(dataUser);
+                this.editLine(tr, dataUser);
 
-            this.formUpdate.reset();
-            btnSubmit.disabled = false;
+                this.formUpdate.reset();
+                btnSubmit.disabled = false;
 
-            this.updateStats();
-            document.querySelector('#box-user-update .btn-cancel').click();
+                this.updateStats();
+                document.querySelector('#box-user-update .btn-cancel').click();
+            }, e =>{
+                console.error(e);
+            });
         });
         
     }
@@ -43,7 +49,7 @@ class UserControlller{
             btnSubmit.disabled = true;
 
             let values = this.getValues(this.formEl);
-            this.loadPhoto().then(uriImage =>{
+            this.loadPhoto(this.formEl).then(uriImage =>{
                 if(values){
                     values.photo = uriImage;
                     this.addLine(values);
@@ -57,9 +63,9 @@ class UserControlller{
         });
     }
 
-    loadPhoto(){        
+    loadPhoto(form){        
         return new Promise((resolve, reject)=>{
-            let photoFile = [...this.formEl.elements].filter(item =>{
+            let photoFile = [...form.elements].filter(item =>{
                 if(item.type=='file'){
                     return item;
                 }
@@ -75,7 +81,8 @@ class UserControlller{
                 };
                 reader.readAsDataURL(photoFile);
             } else{
-                resolve('dist/img/boxed-bg.jpg');
+                let img = form.id==this.formUpdate.id ? null :'dist/img/boxed-bg.jpg';
+                resolve(img);
             }
         });
     }
@@ -151,9 +158,9 @@ class UserControlller{
             for(let name in jsonUser){             
                 let field = this.formUpdate.querySelector('[name='+name.replace("_","")+']');
                 if(field){
-                    if(field.type=='file') continue;
                     switch(field.type){
                         case 'file':
+                            this.formUpdate.querySelector('img.current-photo').src = jsonUser[name];
                             continue;
                             break;
                         case 'radio':
