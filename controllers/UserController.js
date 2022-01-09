@@ -10,10 +10,16 @@ class UserControlller{
         this.formEl.addEventListener('submit', event =>{
             event.preventDefault();
 
+            let btnSubmit = this.formEl.querySelector('[type=submit]');
+            btnSubmit.disabled = true;
+
             let values = this.getValues();
             this.loadPhoto().then(uriImage =>{
                 values.photo = uriImage;
                 this.addLine(values);
+
+                this.formEl.reset();
+                btnSubmit.disabled = false;
             }, e =>{
                 console.error(e);
             });
