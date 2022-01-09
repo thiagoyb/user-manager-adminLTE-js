@@ -3,8 +3,8 @@ class User{
         for(let [key, val] of Object.entries(user)){
             eval(`this._${key} = '${val}';`);
         }
-        this._register = new Date();
-        
+        this._register = new Date().toISOString().substring(0,19).replace('T',' ');
+
         console.log(this);
     }
 
