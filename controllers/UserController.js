@@ -6,6 +6,7 @@ class UserControlller{
         this.tableEl = document.getElementById(tableId);
         this.onSubmit();
         this.onEditEvents();
+        this.loadUsers();
     }
 
     onEditEvents(){
@@ -26,7 +27,6 @@ class UserControlller{
                 dataUser.photo = !uriImage ? oldImg : uriImage;
 
                 let tr =  this.tableEl.rows[this.formUpdate.dataset.trIndex];
-                tr.dataset.user = JSON.stringify(dataUser);
                 this.editLine(tr, dataUser);
 
                 this.formUpdate.reset();
@@ -52,6 +52,7 @@ class UserControlller{
             this.loadPhoto(this.formEl).then(uriImage =>{
                 if(values){
                     values.photo = uriImage;
+                    this.insert(values);
                     this.addLine(values);
                 }
 
@@ -102,6 +103,39 @@ class UserControlller{
         return true;
     }
 
+    removeUnderline(array){
+        let object = {};
+        if(typeof array =='string'){
+            return array.replace('_','');
+        } else if(typeof array == 'object'){
+            for(let [key, val] of Object.entries(array)){
+                object[key.replace('_','')] = val;
+            };
+            return object;
+        }
+    }
+
+    selectAll(){
+        let users = [];
+        if(sessionStorage.getItem('users')){
+            users = JSON.parse(sessionStorage.getItem('users'));
+        }
+        return users;
+    }
+
+    loadUsers(){
+        let users = this.selectAll();
+        users.forEach(dataUser =>{
+            this.addLine(new User(dataUser));
+        });
+    }
+
+    insert(userObject){
+        let users = this.selectAll();
+        users.push(this.removeUnderline(userObject));
+        sessionStorage.setItem('users', JSON.stringify(users));
+    }
+
     getValues(formEl){
         let user = {};
         let isValid = true;
@@ -125,9 +159,8 @@ class UserControlller{
         return isValid ? new User(user) : {};
     }
 
-    addLine(dataUser){
+    addLine(dataUser, save=true){
         let tr = document.createElement("TR");
-        tr.dataset.user = JSON.stringify(dataUser);
 
         this.editLine(tr, dataUser);        
         this.tableEl.appendChild(tr);
@@ -136,6 +169,8 @@ class UserControlller{
     }
 
     editLine(tr, dataUser){
+        tr.dataset.user = JSON.stringify(this.removeUnderline(dataUser));
+
         let isAdmin = dataUser.admin===true||dataUser.admin==='true'  ? 'Sim' : 'Não';
         tr.innerHTML = `
             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
@@ -194,7 +229,7 @@ class UserControlller{
             countUsers++;
 
             let user = JSON.parse(tr.dataset.user);
-            if(user._admin=='true'||user._admin===true) countAdmin++;
+            if(user.admin=='true'||user.admin===true) countAdmin++;
         });
 
         document.querySelector('#count-users').innerHTML = countUsers;
