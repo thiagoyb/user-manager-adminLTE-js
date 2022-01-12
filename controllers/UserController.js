@@ -148,6 +148,13 @@ class UserControlller{
                 <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
             </td>`;
 
+        tr.querySelector(".btn-delete").addEventListener('click', event =>{
+            if(confirm(`Deseja realmente apagar ${dataUser.name}?`)){
+                tr.remove();
+                this.updateStats();
+            }
+        });
+
         tr.querySelector(".btn-edit").addEventListener('click', event =>{
             document.querySelector('#box-user-create').style.display = 'none';
             document.querySelector('#box-user-update').style.display = 'block';
