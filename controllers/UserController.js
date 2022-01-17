@@ -6,7 +6,7 @@ class UserControlller{
         this.tableEl = document.getElementById(tableId);
         this.onSubmit();
         this.onEditEvents();
-        this.loadUsers(1);
+        this.loadUsers();
     }
 
     onEditEvents(){
@@ -27,7 +27,12 @@ class UserControlller{
                 dataUser.photo = !uriImage ? oldImg : uriImage;
 
                 let tr =  this.tableEl.rows[this.formUpdate.dataset.trIndex];
-                this.editLine(tr, dataUser);
+                let oldUser = JSON.parse(tr.dataset.user);
+                let curUser = Utils.removeUnderline(dataUser);
+                let newUser = new User(Object.assign({}, oldUser, curUser));
+
+                newUser.save();
+                this.editLine(tr, newUser);
 
                 this.formUpdate.reset();
                 btnSubmit.disabled = false;
@@ -52,7 +57,7 @@ class UserControlller{
             this.loadPhoto(this.formEl).then(uriImage =>{
                 if(values){
                     values.photo = uriImage;
-                    this.insert(values, 1);
+                    values.save();
                     this.addLine(values);
                 }
 
@@ -103,46 +108,11 @@ class UserControlller{
         return true;
     }
 
-    removeUnderline(o){
-        let object = {};
-        if(typeof o =='string'){
-            return o.replace('_','');
-        }
-        else if(typeof o == 'object'){
-            for(let [key, val] of Object.entries(o)){
-                object[key.replace('_','')] = val;
-            }
-            return object;
-        }
-    }
-
-    selectAll(p){
-        let users = [];
-        if(!p && sessionStorage.getItem('sessionUsers')){
-            users = JSON.parse(sessionStorage.getItem('sessionUsers'));
-        }
-        if(p && localStorage.getItem('localUsers')){
-            users = JSON.parse(localStorage.getItem('localUsers'));
-        }
-        return users;
-    }
-
     loadUsers(p=true){
-        let users = this.selectAll(p);
+        let users = User.getUsersStorage(p);
         users.forEach(dataUser =>{
             this.addLine(new User(dataUser));
         });
-    }
-
-    insert(userObject, p=true){
-        let users = this.selectAll(p);
-        users.push(this.removeUnderline(userObject));
-
-        if(!p){
-            sessionStorage.setItem('sessionUsers', JSON.stringify(users));
-        } else{
-            localStorage.setItem('localUsers', JSON.stringify(users));
-        }
     }
 
     getValues(formEl){
@@ -178,7 +148,7 @@ class UserControlller{
     }
 
     editLine(tr, dataUser){
-        tr.dataset.user = JSON.stringify(this.removeUnderline(dataUser));
+        tr.dataset.user = JSON.stringify(Utils.removeUnderline(dataUser));
 
         let isAdmin = dataUser.admin===true||dataUser.admin==='true'  ? 'Sim' : 'Não';
         tr.innerHTML = `
