@@ -45,25 +45,30 @@ class User{
         return this._admin;
     }
 
-    static getUsersStorage(p=true){
+    static getUsersStorage(){
         let users = [];
-        if(!p && sessionStorage.getItem('sessionUsers')){
-            users = JSON.parse(sessionStorage.getItem('sessionUsers'));
-        }
-        if(p && localStorage.getItem('localUsers')){
+
+        if(localStorage.getItem('localUsers')){
             users = JSON.parse(localStorage.getItem('localUsers'));
         }
+
         return users;
     }
 
     getNewId(){
-        if(!window.id) window.id = 0;
-        window.id = window.id +1;
-        return window.id;
+        let id = 0;
+
+        if(localStorage.getItem("usersID")){
+            id = parseInt(localStorage.getItem("usersID"));
+        }
+
+        id++;
+        localStorage.setItem("usersID",id);
+        return id;
     }
 
-    save(p=true){
-        let users = User.getUsersStorage(p);
+    save(){
+        let users = User.getUsersStorage();
 
         if(this.id > 0){
             users.map(u=>{
@@ -77,11 +82,19 @@ class User{
             users.push(Utils.removeUnderline(this));
         }
 
-        if(!p){
-            sessionStorage.setItem('sessionUsers', JSON.stringify(users));
-        } else{
-            localStorage.setItem('localUsers', JSON.stringify(users));
-        }
+        localStorage.setItem('localUsers', JSON.stringify(users));
+    }
+
+    remove(){
+        let users = User.getUsersStorage();
+
+        users.forEach((u, i) => {
+            if(u.id == this.id){
+                users.splice(i, 1);//splice remove do array original. slice retorna parte do array.
+            }
+        });
+
+        localStorage.setItem('localUsers', JSON.stringify(users));
     }
 
 }

@@ -108,8 +108,8 @@ class UserControlller{
         return true;
     }
 
-    loadUsers(p=true){
-        let users = User.getUsersStorage(p);
+    loadUsers(){
+        let users = User.getUsersStorage();
         users.forEach(dataUser =>{
             this.addLine(new User(dataUser));
         });
@@ -164,6 +164,9 @@ class UserControlller{
 
         tr.querySelector(".btn-delete").addEventListener('click', event =>{
             if(confirm(`Deseja realmente apagar ${dataUser.name}?`)){
+
+                let user = new User(JSON.parse(tr.dataset.user));
+                user.remove();
                 tr.remove();
                 this.updateStats();
             }
