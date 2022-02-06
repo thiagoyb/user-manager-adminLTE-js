@@ -1,0 +1,23 @@
+{
+  "name": "projeto-usuarios-adminLTE-restful-nodejs",
+  "main": "index.js",
+  "homepage": "https://github.com/thiagoyb/user-manager-adminLTE-js",
+  "authors": [
+    "Thiago Yamanaka <thiagoyb@gmail.com>"
+  ],
+  "description": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "font-awesome": "^4.7.0",
+    "bootstrap": "^3.3.7",
+    "Ionicons": "ionicons#^2.0.1"
+  }
+}
