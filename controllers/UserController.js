@@ -111,7 +111,7 @@ class UserControlller{
     loadUsers(){
         let users = User.getUsersStorage();
         users.forEach(dataUser =>{
-            this.addLine(new User(dataUser));
+            this.addLine(new User(Utils.removeUnderline(dataUser)));
         });
     }
 
@@ -149,10 +149,11 @@ class UserControlller{
 
     editLine(tr, dataUser){
         tr.dataset.user = JSON.stringify(Utils.removeUnderline(dataUser));
+        let userPhoto = eval(dataUser.photo)!=null ? dataUser.photo :'dist/img/boxed-bg.jpg';
 
-        let isAdmin = dataUser.admin===true||dataUser.admin==='true'  ? 'Sim' : 'Não';
+        let isAdmin = eval(dataUser.admin)  ? 'Sim' : 'Não';
         tr.innerHTML = `
-            <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
+            <td><img src="${userPhoto}" alt="User Image" class="img-circle img-sm"></td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
             <td>${isAdmin}</td>
@@ -192,7 +193,7 @@ class UserControlller{
                             if(field) field.checked = true;
                             break;
                         case 'checkbox':
-                            field.checked = jsonUser[name]==true||jsonUser[name]=='true';
+                            field.checked = eval(jsonUser[name]);
                             break;
                         default:
                             field.value = jsonUser[name];
@@ -211,7 +212,7 @@ class UserControlller{
             countUsers++;
 
             let user = JSON.parse(tr.dataset.user);
-            if(user.admin=='true'||user.admin===true) countAdmin++;
+            if(eval(user.admin)===true) countAdmin++;
         });
 
         document.querySelector('#count-users').innerHTML = countUsers;

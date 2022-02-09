@@ -1,10 +1,12 @@
 class User{
     constructor(user){
-        for(let [key, val] of Object.entries(user)){
-            eval(`this._${key} = '${val}';`);
-        }
         this._register = new Date().toISOString().substring(0,19).replace('T',' ');
         this._id;
+        
+        for(let [key, val] of Object.entries(user)){
+            key = key.split('_').join('');
+            eval(`this._${key} = '${val}';`);
+        }
 
         console.log(this);
     }
